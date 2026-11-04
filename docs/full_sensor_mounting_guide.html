@@ -1,0 +1,255 @@
+
+<style>
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+*{box-sizing:border-box}
+.wrap{padding:1rem 0;font-family:var(--font-sans)}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.05em;margin:14px 0 8px 2px}
+.chassis-wrap{position:relative;margin-bottom:16px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{font-size:12px;padding:5px 14px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.tab.active{background:#EEEDFE;border-color:#7F77DD;color:#3C3489;font-weight:500}
+.panel{display:none}
+.panel.active{display:block}
+.sensor-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;background:var(--color-background-primary);margin-bottom:10px}
+.sensor-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sensor-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0}
+.sensor-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.sensor-role{font-size:12px;color:var(--color-text-secondary)}
+.pin-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.pin-row:last-child{border-bottom:none}
+.wire-pill{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;min-width:52px;text-align:center;flex-shrink:0}
+.pin-from{font-size:12px;color:var(--color-text-primary);min-width:80px;font-family:var(--font-mono)}
+.pin-to{font-size:12px;color:var(--color-text-secondary)}
+.mount-tip{padding:8px 12px;border-radius:var(--border-radius-md);font-size:12px;margin-top:8px;line-height:1.5}
+.i2c-box{padding:12px 14px;border-radius:var(--border-radius-lg);background:#EEEDFE;border:0.5px solid #7F77DD;margin-bottom:10px}
+.i2c-title{font-size:13px;font-weight:500;color:#3C3489;margin-bottom:6px}
+.i2c-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.i2c-chip{font-size:11px;font-weight:500;padding:2px 10px;border-radius:10px;min-width:90px;text-align:center}
+.addr{font-family:var(--font-mono);font-size:12px;color:#534AB7}
+.i2c-desc{font-size:12px;color:#534AB7}
+.position-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pos-card{padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.pos-name{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.pos-where{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+.warn{padding:10px 12px;border-radius:var(--border-radius-md);background:#FAEEDA;border:0.5px solid #BA7517;margin-bottom:10px}
+.warn-t{font-size:12px;font-weight:500;color:#633806;margin-bottom:3px}
+.warn-d{font-size:12px;color:#854F0B;line-height:1.5}
+.ok{padding:10px 12px;border-radius:var(--border-radius-md);background:#EAF3DE;border:0.5px solid #639922;margin-bottom:10px}
+.ok-t{font-size:12px;font-weight:500;color:#27500A;margin-bottom:3px}
+.ok-d{font-size:12px;color:#3B6D11;line-height:1.5}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">Full sensor mounting guide for disaster response robot</h2>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('position')">Mounting positions</div>
+  <div class="tab" onclick="showTab('wiring')">Pin wiring</div>
+  <div class="tab" onclick="showTab('i2c')">I2C sharing</div>
+  <div class="tab" onclick="showTab('thermal')">+ Thermal upgrade</div>
+</div>
+
+<!-- PANEL 1: Mounting positions -->
+<div class="panel active" id="tab-position">
+  <div class="section-label">WHERE EACH COMPONENT SITS ON CHASSIS</div>
+
+  <svg width="100%" viewBox="0 0 640 360" style="margin-bottom:12px;display:block">
+    <!-- Chassis body -->
+    <rect x="160" y="40" width="280" height="280" rx="16" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/>
+    <text font-family="sans-serif" font-size="11" fill="#888780" x="300" y="32" text-anchor="middle">FRONT</text>
+    <polygon points="300,34 295,42 305,42" fill="#888780"/>
+
+    <!-- Left wheel -->
+    <rect x="132" y="110" width="28" height="90" rx="8" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+    <!-- Right wheel -->
+    <rect x="440" y="110" width="28" height="90" rx="8" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+    <!-- Castor -->
+    <circle cx="300" cy="296" r="14" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+
+    <!-- VL53L0X — front center -->
+    <rect x="268" y="46" width="64" height="28" rx="5" fill="#9FE1CB" stroke="#0F6E56" stroke-width="1"/>
+    <text font-family="sans-serif" font-size="10" font-weight="500" fill="#085041" x="300" y="64" text-anchor="middle">VL53L0X</text>
+
+    <!-- MPU6050 — center of chassis -->
+    <rect x="256" y="148" width="88" height="36" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="1"/>
+    <text font-family="sans-serif" font-size="10" font-weight="500" fill="#3C3489" x="300" y="170" text-anchor="middle">MPU6050</text>
+
+    <!-- TB6612 — upper area -->
+    <rect x="246" y="90" width="108" height="34" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+    <text font-family="sans-serif" font-size="10" font-weight="500" fill="#633806" x="300" y="111" text-anchor="middle">TB6612FNG</text>
+
+    <!-- Buck converter — lower area -->
+    <rect x="256" y="206" width="88" height="34" rx="6" fill="#C0DD97" stroke="#3B6D11" stroke-width="1"/>
+    <text font-family="sans-serif" font-size="10" font-weight="500" fill="#27500A" x="300" y="227" text-anchor="middle">Buck converter</text>
+
+    <!-- Battery — bottom -->
+    <rect x="240" y="254" width="120" height="32" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+    <text font-family="sans-serif" font-size="10" font-weight="500" fill="#0C447C" x="300" y="274" text-anchor="middle">18650 x2</text>
+
+    <!-- MLX90614 (future) — front right -->
+    <rect x="352" y="46" width="72" height="28" rx="5" fill="#F5C4B3" stroke="#993C1D" stroke-width="1" stroke-dasharray="4 2"/>
+    <text font-family="sans-serif" font-size="10" font-weight="500" fill="#712B13" x="388" y="64" text-anchor="middle">MLX90614*</text>
+
+    <!-- ESP32 — top layer label -->
+    <rect x="160" y="40" width="280" height="280" rx="16" fill="none" stroke="#7F77DD" stroke-width="0.5" stroke-dasharray="6 3"/>
+    <text font-family="sans-serif" font-size="9" fill="#7F77DD" x="452" y="56" text-anchor="start">ESP32</text>
+    <text font-family="sans-serif" font-size="9" fill="#7F77DD" x="452" y="68" text-anchor="start">on breadboard</text>
+    <text font-family="sans-serif" font-size="9" fill="#7F77DD" x="452" y="80" text-anchor="start">above all this</text>
+
+    <!-- Number labels -->
+    <circle cx="300" cy="60" r="7" fill="#0F6E56"/>
+    <text font-family="sans-serif" font-size="9" font-weight="500" fill="white" x="300" y="63" text-anchor="middle">1</text>
+    <circle cx="300" cy="107" r="7" fill="#854F0B"/>
+    <text font-family="sans-serif" font-size="9" font-weight="500" fill="white" x="300" y="110" text-anchor="middle">2</text>
+    <circle cx="300" cy="166" r="7" fill="#534AB7"/>
+    <text font-family="sans-serif" font-size="9" font-weight="500" fill="white" x="300" y="169" text-anchor="middle">3</text>
+    <circle cx="300" cy="223" r="7" fill="#3B6D11"/>
+    <text font-family="sans-serif" font-size="9" font-weight="500" fill="white" x="300" y="226" text-anchor="middle">4</text>
+    <circle cx="300" cy="270" r="7" fill="#185FA5"/>
+    <text font-family="sans-serif" font-size="9" font-weight="500" fill="white" x="300" y="273" text-anchor="middle">5</text>
+    <circle cx="388" cy="60" r="7" fill="#993C1D"/>
+    <text font-family="sans-serif" font-size="9" font-weight="500" fill="white" x="388" y="63" text-anchor="middle">*</text>
+  </svg>
+
+  <div class="position-grid">
+    <div class="pos-card"><div class="pos-name" style="color:#085041">1 — VL53L0X</div><div class="pos-where">Front center edge. Must face forward. Tape flat with foam tape.</div></div>
+    <div class="pos-card"><div class="pos-name" style="color:#854F0B">2 — TB6612FNG</div><div class="pos-where">Upper middle. Close to motors so output wires stay short.</div></div>
+    <div class="pos-card"><div class="pos-name" style="color:#534AB7">3 — MPU6050</div><div class="pos-name" style="color:#534AB7"></div><div class="pos-where">Dead center of chassis. Must be flat and level — it measures tilt!</div></div>
+    <div class="pos-card"><div class="pos-name" style="color:#3B6D11">4 — Buck converter</div><div class="pos-where">Lower middle. Between battery and ESP32 power input.</div></div>
+    <div class="pos-card"><div class="pos-name" style="color:#185FA5">5 — Battery pack</div><div class="pos-where">Bottom layer or rear of chassis. Lowest point = better balance.</div></div>
+    <div class="pos-card"><div class="pos-name" style="color:#993C1D">* MLX90614 (future)</div><div class="pos-where">Front edge beside VL53L0X. Both face forward together.</div></div>
+  </div>
+</div>
+
+<!-- PANEL 2: Pin wiring -->
+<div class="panel" id="tab-wiring">
+  <div class="section-label">EVERY PIN — SENSOR TO ESP32</div>
+
+  <div class="sensor-card">
+    <div class="sensor-header">
+      <div class="sensor-icon" style="background:#9FE1CB;color:#085041">ToF</div>
+      <div><div class="sensor-name">VL53L0X</div><div class="sensor-role">Distance sensor — detects objects ahead</div></div>
+    </div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FCEBEB;color:#791F1F">Red</span><span class="pin-from">VCC</span><span class="pin-to">→ ESP32 3.3V</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">GND</span><span class="pin-to">→ ESP32 GND</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EAF3DE;color:#27500A">Green</span><span class="pin-from">SDA</span><span class="pin-to">→ GPIO 21 (shared)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FAEEDA;color:#633806">Yellow</span><span class="pin-from">SCL</span><span class="pin-to">→ GPIO 22 (shared)</span></div>
+    <div class="mount-tip" style="background:#E1F5EE;color:#085041">Tape to front edge of chassis with foam tape. Faces forward.</div>
+  </div>
+
+  <div class="sensor-card">
+    <div class="sensor-header">
+      <div class="sensor-icon" style="background:#CECBF6;color:#3C3489">GY</div>
+      <div><div class="sensor-name">MPU6050</div><div class="sensor-role">Gyroscope + accelerometer — knows direction + tilt</div></div>
+    </div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FCEBEB;color:#791F1F">Red</span><span class="pin-from">VCC</span><span class="pin-to">→ ESP32 3.3V (same as VL53)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">GND</span><span class="pin-to">→ ESP32 GND (same as VL53)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EAF3DE;color:#27500A">Green</span><span class="pin-from">SDA</span><span class="pin-to">→ GPIO 21 (same wire as VL53!)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FAEEDA;color:#633806">Yellow</span><span class="pin-from">SCL</span><span class="pin-to">→ GPIO 22 (same wire as VL53!)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#E6F1FB;color:#0C447C">Any</span><span class="pin-from">AD0</span><span class="pin-to">→ GND (sets I2C address to 0x68)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Skip</span><span class="pin-from">INT</span><span class="pin-to">→ not needed for basic use</span></div>
+    <div class="mount-tip" style="background:#EEEDFE;color:#3C3489">Mount flat and level at chassis center. Even a small tilt gives wrong angle readings.</div>
+  </div>
+
+  <div class="sensor-card">
+    <div class="sensor-header">
+      <div class="sensor-icon" style="background:#FAC775;color:#633806">M</div>
+      <div><div class="sensor-name">TB6612FNG</div><div class="sensor-role">Motor driver — controls both wheel motors</div></div>
+    </div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FCEBEB;color:#791F1F">Red</span><span class="pin-from">VCC</span><span class="pin-to">→ ESP32 3.3V</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">GND</span><span class="pin-to">→ GND</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">VM</span><span class="pin-to">→ Battery+ (motor power, not 3.3V!)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">STBY</span><span class="pin-to">→ GPIO 16</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">AIN1</span><span class="pin-to">→ GPIO 17 (right motor dir)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">AIN2</span><span class="pin-to">→ GPIO 18 (right motor dir)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">PWMA</span><span class="pin-to">→ GPIO 19 (right motor speed)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">BIN1</span><span class="pin-to">→ GPIO 25 (left motor dir)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">BIN2</span><span class="pin-to">→ GPIO 26 (left motor dir)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EEEDFE;color:#3C3489">Purple</span><span class="pin-from">PWMB</span><span class="pin-to">→ GPIO 27 (left motor speed)</span></div>
+    <div class="mount-tip" style="background:#FAEEDA;color:#633806">AOUT1/AOUT2 → right motor wires. BOUT1/BOUT2 → left motor wires.</div>
+  </div>
+
+  <div class="sensor-card">
+    <div class="sensor-header">
+      <div class="sensor-icon" style="background:#C0DD97;color:#27500A">5V</div>
+      <div><div class="sensor-name">Buck converter (LM2596)</div><div class="sensor-role">Steps battery 7.4V down to clean 5V for ESP32</div></div>
+    </div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FCEBEB;color:#791F1F">Red</span><span class="pin-from">IN+</span><span class="pin-to">→ Battery positive</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">IN−</span><span class="pin-to">→ Battery negative</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FCEBEB;color:#791F1F">Red</span><span class="pin-from">OUT+</span><span class="pin-to">→ ESP32 5V pin (VIN)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">OUT−</span><span class="pin-to">→ ESP32 GND</span></div>
+    <div class="mount-tip" style="background:#EAF3DE;color:#27500A">Turn the small screw on the buck converter until output reads exactly 5.0V with a multimeter before connecting to ESP32.</div>
+  </div>
+</div>
+
+<!-- PANEL 3: I2C sharing -->
+<div class="panel" id="tab-i2c">
+  <div class="section-label">HOW ALL 3 SENSORS SHARE 2 WIRES</div>
+
+  <div class="i2c-box">
+    <div class="i2c-title">Each sensor has a unique address — like a phone number</div>
+    <div class="i2c-row">
+      <span class="i2c-chip" style="background:#9FE1CB;color:#085041">VL53L0X</span>
+      <span class="addr">0x29</span>
+      <span class="i2c-desc">distance sensor</span>
+    </div>
+    <div class="i2c-row">
+      <span class="i2c-chip" style="background:#CECBF6;color:#3C3489">MPU6050</span>
+      <span class="addr">0x68</span>
+      <span class="i2c-desc">gyro (AD0 → GND)</span>
+    </div>
+    <div class="i2c-row">
+      <span class="i2c-chip" style="background:#F5C4B3;color:#712B13">MLX90614</span>
+      <span class="addr">0x5A</span>
+      <span class="i2c-desc">thermal (future)</span>
+    </div>
+  </div>
+
+  <div class="ok">
+    <div class="ok-t">How to connect all 3 to the same 2 wires</div>
+    <div class="ok-d">On your breadboard, pick any empty column — call it the SDA column. Plug ALL sensor SDA pins into different rows of that same column. The breadboard connects them internally. Run one wire from that column to GPIO21. Done. Repeat for SCL on GPIO22. That's the entire I2C bus.</div>
+  </div>
+
+  <div class="warn">
+    <div class="warn-t">MPU6050 address conflict warning</div>
+    <div class="warn-d">MPU6050 has a pin called AD0. If AD0 is HIGH it uses address 0x69. If AD0 is LOW (connect to GND) it uses 0x68. Always connect AD0 to GND so the address is fixed and predictable.</div>
+  </div>
+</div>
+
+<!-- PANEL 4: Thermal upgrade -->
+<div class="panel" id="tab-thermal">
+  <div class="section-label">ADDING MLX90614 THERMAL SENSOR LATER</div>
+
+  <div class="sensor-card">
+    <div class="sensor-header">
+      <div class="sensor-icon" style="background:#F5C4B3;color:#712B13">IR</div>
+      <div><div class="sensor-name">MLX90614</div><div class="sensor-role">Detects body heat — confirms human vs wall</div></div>
+    </div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FCEBEB;color:#791F1F">Red</span><span class="pin-from">VCC</span><span class="pin-to">→ 3.3V (same rail)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#F1EFE8;color:#2C2C2A">Black</span><span class="pin-from">GND</span><span class="pin-to">→ GND (same rail)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#EAF3DE;color:#27500A">Green</span><span class="pin-from">SDA</span><span class="pin-to">→ GPIO 21 (same SDA column)</span></div>
+    <div class="pin-row"><span class="wire-pill" style="background:#FAEEDA;color:#633806">Yellow</span><span class="pin-from">SCL</span><span class="pin-to">→ GPIO 22 (same SCL column)</span></div>
+    <div class="mount-tip" style="background:#FAECE7;color:#712B13">Mount right next to VL53L0X on front edge. Both must point at the same target simultaneously for accurate detection.</div>
+  </div>
+
+  <div class="ok">
+    <div class="ok-t">Why MPU6050 makes your robot smarter</div>
+    <div class="ok-d">You already have MPU6050 — this replaces the need for wheel encoders for direction tracking! The gyroscope tells you exact heading angle in degrees. When the robot turns, MPU6050 measures exactly how many degrees it turned. Way more accurate than counting wheel pulses.</div>
+  </div>
+
+  <div class="warn">
+    <div class="warn-t">Install these 2 libraries in Arduino IDE</div>
+    <div class="warn-d">1. Search "MPU6050" → install by Electronic Cats<br>2. Search "MLX90614" → install by Adafruit<br>VL53L0X library by Pololu already installed from before.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

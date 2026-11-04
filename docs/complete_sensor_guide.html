@@ -1,0 +1,301 @@
+
+<style>
+*{box-sizing:border-box}
+.wrap{padding:1rem 0;font-family:var(--font-sans)}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{font-size:12px;padding:6px 14px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-secondary)}
+.tab.active{background:#EEEDFE;border-color:#7F77DD;color:#3C3489;font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.sensor-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px;background:var(--color-background-primary)}
+.sensor-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sensor-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sensor-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.sensor-role{font-size:12px;color:var(--color-text-secondary)}
+.pin-table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.pin-table th{font-size:10px;font-weight:500;color:var(--color-text-secondary);text-align:left;padding:4px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.pin-table td{font-size:12px;padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.pin-table tr:last-child td{border-bottom:none}
+.wire{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.mount-tip{padding:8px 12px;border-radius:var(--border-radius-md);font-size:12px;margin-top:8px;line-height:1.6}
+.face-tip{padding:8px 12px;border-radius:var(--border-radius-md);font-size:12px;margin-top:6px;line-height:1.6;background:#E6F1FB;color:#0C447C;border:0.5px solid #378ADD}
+.warn{padding:8px 12px;border-radius:var(--border-radius-md);font-size:12px;margin-top:6px;line-height:1.6;background:#FAEEDA;color:#633806;border:0.5px solid #BA7517}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.05em;margin:14px 0 8px 2px}
+.order-list{counter-reset:step}
+.order-item{counter-increment:step;display:flex;gap:10px;margin-bottom:10px;padding:10px 12px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary)}
+.order-item::before{content:counter(step);width:24px;height:24px;border-radius:50%;background:#3b82f6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.order-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.order-text strong{color:var(--color-text-primary)}
+</style>
+
+<div class="wrap">
+<div class="tabs">
+  <div class="tab active" onclick="showTab('wiring')">Pin Wiring</div>
+  <div class="tab" onclick="showTab('mounting')">Mounting</div>
+  <div class="tab" onclick="showTab('order')">Build Order</div>
+  <div class="tab" onclick="showTab('power')">Power</div>
+</div>
+
+<!-- WIRING TAB -->
+<div class="panel active" id="tab-wiring">
+
+<div class="sensor-card">
+  <div class="sensor-header">
+    <div class="sensor-icon" style="background:#9FE1CB;color:#085041">ToF</div>
+    <div><div class="sensor-name">VL53L0X — Distance sensor</div><div class="sensor-role">Already connected ✅</div></div>
+  </div>
+  <table class="pin-table">
+    <tr><th>Sensor pin</th><th>Wire color</th><th>ESP32 pin</th></tr>
+    <tr><td>VCC</td><td><span class="wire" style="background:#ef4444"></span>Red</td><td>3.3V</td></tr>
+    <tr><td>GND</td><td><span class="wire" style="background:#1f2937"></span>Black</td><td>GND</td></tr>
+    <tr><td>SDA</td><td><span class="wire" style="background:#22c55e"></span>Green</td><td>GPIO 21</td></tr>
+    <tr><td>SCL</td><td><span class="wire" style="background:#eab308"></span>Yellow</td><td>GPIO 22</td></tr>
+    <tr><td>XSHUT</td><td>—</td><td>leave empty</td></tr>
+  </table>
+  <div class="face-tip">Laser window faces FORWARD. Mount on front edge of chassis.</div>
+</div>
+
+<div class="sensor-card">
+  <div class="sensor-header">
+    <div class="sensor-icon" style="background:#CECBF6;color:#3C3489">GY</div>
+    <div><div class="sensor-name">MPU6050 — Gyroscope</div><div class="sensor-role">Already connected ✅</div></div>
+  </div>
+  <table class="pin-table">
+    <tr><th>Sensor pin</th><th>Wire color</th><th>ESP32 pin</th></tr>
+    <tr><td>VCC</td><td><span class="wire" style="background:#ef4444"></span>Red</td><td>3.3V (same rail)</td></tr>
+    <tr><td>GND</td><td><span class="wire" style="background:#1f2937"></span>Black</td><td>GND (same rail)</td></tr>
+    <tr><td>SDA</td><td><span class="wire" style="background:#22c55e"></span>Green</td><td>GPIO 21 (shared)</td></tr>
+    <tr><td>SCL</td><td><span class="wire" style="background:#eab308"></span>Yellow</td><td>GPIO 22 (shared)</td></tr>
+    <tr><td>AD0</td><td><span class="wire" style="background:#1f2937"></span>Black</td><td>GND (fixes address 0x68)</td></tr>
+    <tr><td>INT</td><td>—</td><td>leave empty</td></tr>
+  </table>
+  <div class="face-tip">Mount FLAT and LEVEL in center of chassis. Tilt = wrong readings!</div>
+</div>
+
+<div class="sensor-card">
+  <div class="sensor-header">
+    <div class="sensor-icon" style="background:#F5C4B3;color:#712B13">IR</div>
+    <div><div class="sensor-name">MLX90614 — Thermal sensor</div><div class="sensor-role">Needs connecting now!</div></div>
+  </div>
+  <table class="pin-table">
+    <tr><th>Sensor pin</th><th>Wire color</th><th>ESP32 pin</th></tr>
+    <tr><td>VTN (VCC)</td><td><span class="wire" style="background:#ef4444"></span>Red</td><td>3.3V ONLY! NOT 5V!</td></tr>
+    <tr><td>GND</td><td><span class="wire" style="background:#1f2937"></span>Black</td><td>GND (same rail)</td></tr>
+    <tr><td>SDA</td><td><span class="wire" style="background:#22c55e"></span>Green</td><td>GPIO 21 (same as others!)</td></tr>
+    <tr><td>SCL</td><td><span class="wire" style="background:#eab308"></span>Yellow</td><td>GPIO 22 (same as others!)</td></tr>
+  </table>
+  <div class="warn">VTN pin MUST go to 3.3V — NOT 5V, NOT battery! This was causing ESP32 to overheat!</div>
+  <div class="face-tip">Metal dome faces FORWARD beside VL53L0X. Both point at same target.</div>
+</div>
+
+<div class="sensor-card">
+  <div class="sensor-header">
+    <div class="sensor-icon" style="background:#FAC775;color:#633806">📡</div>
+    <div><div class="sensor-name">RCWL-0516 — Radar sensor</div><div class="sensor-role">Needs soldering first</div></div>
+  </div>
+  <table class="pin-table">
+    <tr><th>Sensor pin</th><th>Wire color</th><th>ESP32 pin</th></tr>
+    <tr><td>VIN</td><td><span class="wire" style="background:#ef4444"></span>Red</td><td>3.3V</td></tr>
+    <tr><td>GND</td><td><span class="wire" style="background:#1f2937"></span>Black</td><td>GND</td></tr>
+    <tr><td>OUT</td><td><span class="wire" style="background:#a855f7"></span>Purple</td><td>GPIO 32</td></tr>
+    <tr><td>3V3</td><td>—</td><td>leave empty</td></tr>
+    <tr><td>CDS</td><td>—</td><td>leave empty</td></tr>
+  </table>
+  <div class="face-tip">Component/chip side faces FORWARD. Mount on top of chassis angled up slightly.</div>
+</div>
+
+<div class="sensor-card">
+  <div class="sensor-header">
+    <div class="sensor-icon" style="background:#C0DD97;color:#27500A">SW</div>
+    <div><div class="sensor-name">MTS-103 Toggle Switch — Power</div><div class="sensor-role">Master ON/OFF</div></div>
+  </div>
+  <table class="pin-table">
+    <tr><th>Switch leg</th><th>Wire color</th><th>Connects to</th></tr>
+    <tr><td>Leg 1 (left)</td><td><span class="wire" style="background:#ef4444"></span>Red</td><td>Battery RED wire</td></tr>
+    <tr><td>Leg 2 (middle)</td><td><span class="wire" style="background:#ef4444"></span>Red</td><td>Buck converter IN+</td></tr>
+    <tr><td>Leg 3 (right)</td><td>—</td><td>leave empty</td></tr>
+  </table>
+  <div class="face-tip">Mount on RIGHT SIDE wall of chassis. Toggle UP = Power ON, Toggle DOWN = Power OFF.</div>
+</div>
+
+<div class="sensor-card">
+  <div class="sensor-header">
+    <div class="sensor-icon" style="background:#B5D4F4;color:#0C447C">BTN</div>
+    <div><div class="sensor-name">Tactile Push Button — Manual backup start</div><div class="sensor-role">Physical START button</div></div>
+  </div>
+  <table class="pin-table">
+    <tr><th>Button pin</th><th>Wire color</th><th>ESP32 pin</th></tr>
+    <tr><td>Pin 1</td><td><span class="wire" style="background:#3b82f6"></span>Blue</td><td>GPIO 34</td></tr>
+    <tr><td>Pin 2</td><td><span class="wire" style="background:#1f2937"></span>Black</td><td>GND</td></tr>
+  </table>
+  <div class="face-tip">Plug directly into breadboard. Mount on LEFT SIDE of chassis. Press = robot starts!</div>
+</div>
+
+</div>
+
+<!-- MOUNTING TAB -->
+<div class="panel" id="tab-mounting">
+<svg width="100%" viewBox="0 0 640 420">
+  <!-- Chassis -->
+  <rect x="150" y="30" width="300" height="340" rx="16" fill="#F1EFE8" stroke="#888780" stroke-width="1.5"/>
+  <text font-family="sans-serif" font-size="11" fill="#888780" x="300" y="22" text-anchor="middle">FRONT ↓</text>
+
+  <!-- Wheels -->
+  <rect x="122" y="110" width="28" height="90" rx="8" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+  <rect x="450" y="110" width="28" height="90" rx="8" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+  <circle cx="300" cy="348" r="14" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="1"/>
+
+  <!-- Front sensor bar -->
+  <rect x="163" y="36" width="274" height="30" rx="5" fill="#E6F1FB" stroke="#378ADD" stroke-width="0.5" stroke-dasharray="3 2"/>
+  <text font-family="sans-serif" font-size="9" fill="#185FA5" x="300" y="48" text-anchor="middle">FRONT SENSOR EDGE</text>
+  <text font-family="sans-serif" font-size="8" fill="#378ADD" x="300" y="60" text-anchor="middle">all 3 sensors face forward here</text>
+
+  <!-- MLX90614 -->
+  <rect x="163" y="66" width="60" height="22" rx="4" fill="#F5C4B3" stroke="#993C1D" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="#712B13" x="193" y="80" text-anchor="middle">MLX90614</text>
+
+  <!-- VL53L0X -->
+  <rect x="240" y="66" width="60" height="22" rx="4" fill="#9FE1CB" stroke="#0F6E56" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="#085041" x="270" y="80" text-anchor="middle">VL53L0X</text>
+
+  <!-- RCWL -->
+  <rect x="317" y="66" width="60" height="22" rx="4" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="#633806" x="347" y="80" text-anchor="middle">RCWL-0516</text>
+
+  <!-- Breadboard + ESP32 -->
+  <rect x="175" y="105" width="250" height="70" rx="8" fill="#E6F1FB" stroke="#378ADD" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="10" font-weight="500" fill="#0C447C" x="300" y="137" text-anchor="middle">Breadboard + ESP32</text>
+  <text font-family="sans-serif" font-size="9" fill="#185FA5" x="300" y="152" text-anchor="middle">all wires connect here</text>
+
+  <!-- MPU6050 -->
+  <rect x="200" y="192" width="90" height="32" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="9" font-weight="500" fill="#3C3489" x="245" y="211" text-anchor="middle">MPU6050</text>
+  <text font-family="sans-serif" font-size="8" fill="#534AB7" x="245" y="221" text-anchor="middle">flat + level!</text>
+
+  <!-- TB6612 -->
+  <rect x="310" y="192" width="90" height="32" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="9" font-weight="500" fill="#633806" x="355" y="211" text-anchor="middle">TB6612FNG</text>
+
+  <!-- Buck converter -->
+  <rect x="200" y="242" width="90" height="32" rx="6" fill="#C0DD97" stroke="#3B6D11" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="9" font-weight="500" fill="#27500A" x="245" y="261" text-anchor="middle">Buck 5V</text>
+
+  <!-- TP4056 -->
+  <rect x="310" y="242" width="90" height="32" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="9" font-weight="500" fill="#0C447C" x="355" y="261" text-anchor="middle">TP4056</text>
+
+  <!-- Battery -->
+  <rect x="195" y="292" width="210" height="36" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="10" font-weight="500" fill="#0C447C" x="300" y="314" text-anchor="middle">18650 Battery x2</text>
+
+  <!-- Toggle switch RIGHT side -->
+  <rect x="450" y="155" width="22" height="50" rx="4" fill="#C0DD97" stroke="#3B6D11" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="#27500A" x="461" y="178" text-anchor="middle">SW</text>
+  <text font-family="sans-serif" font-size="7" fill="#3B6D11" x="461" y="188" text-anchor="middle">ON/OFF</text>
+
+  <!-- Push button LEFT side -->
+  <rect x="128" y="165" width="22" height="22" rx="4" fill="#F5C4B3" stroke="#993C1D" stroke-width="1"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="#712B13" x="139" y="179" text-anchor="middle">BTN</text>
+
+  <!-- Number labels -->
+  <circle cx="193" cy="77" r="8" fill="#993C1D"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="white" x="193" y="80" text-anchor="middle">1</text>
+  <circle cx="270" cy="77" r="8" fill="#0F6E56"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="white" x="270" y="80" text-anchor="middle">2</text>
+  <circle cx="347" cy="77" r="8" fill="#854F0B"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="white" x="347" y="80" text-anchor="middle">3</text>
+  <circle cx="245" cy="208" r="8" fill="#534AB7"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="white" x="245" y="211" text-anchor="middle">4</text>
+  <circle cx="461" cy="170" r="8" fill="#3B6D11"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="white" x="461" y="173" text-anchor="middle">5</text>
+  <circle cx="139" cy="170" r="8" fill="#993C1D"/>
+  <text font-family="sans-serif" font-size="8" font-weight="500" fill="white" x="139" y="173" text-anchor="middle">6</text>
+</svg>
+
+<div style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;line-height:1.8">
+  <b style="color:var(--color-text-primary)">1 MLX90614</b> — front left edge, dome forward<br>
+  <b style="color:var(--color-text-primary)">2 VL53L0X</b> — front center edge, laser forward ✅ already done<br>
+  <b style="color:var(--color-text-primary)">3 RCWL-0516</b> — front right edge, chip forward<br>
+  <b style="color:var(--color-text-primary)">4 MPU6050</b> — center chassis, perfectly flat ✅ already done<br>
+  <b style="color:var(--color-text-primary)">5 Toggle switch</b> — right side wall, easy to reach<br>
+  <b style="color:var(--color-text-primary)">6 Push button</b> — left side wall, easy to press
+</div>
+</div>
+
+<!-- BUILD ORDER TAB -->
+<div class="panel" id="tab-order">
+<div class="section-label">DO THESE IN EXACT ORDER — don't skip!</div>
+<div class="order-list">
+  <div class="order-item">
+    <div class="order-text"><strong>Remove ALL wires and start fresh</strong><br>Take photo of current wiring first. Then pull everything out. Fresh start = no shorts!</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Set up power rails on breadboard</strong><br>Red top row = 3.3V from ESP32. Blue top row = GND. Every sensor pulls from these rails.</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Connect ESP32 to laptop USB only</strong><br>No battery yet. Check serial monitor shows startup. Should stay COOL.</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Add VL53L0X (already working)</strong><br>4 wires: 3.3V, GND, GPIO21, GPIO22. Run I2C scanner — should show 0x29.</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Add MPU6050 (already working)</strong><br>5 wires: 3.3V, GND, GPIO21, GPIO22, AD0→GND. Scanner should show 0x68.</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Add MLX90614 carefully</strong><br>VTN→3.3V ONLY! GND→GND, SDA→GPIO21, SCL→GPIO22. Touch ESP32 — if HOT disconnect immediately!</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Run I2C scanner — confirm all 3</strong><br>0x29=VL53L0X, 0x5A=MLX90614, 0x68=MPU6050. All 3 must appear!</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Connect motors + TB6612</strong><br>STBY→16, AIN1→17, AIN2→18, PWMA→19, BIN1→25, BIN2→26, PWMB→27. Test motors spin.</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Connect battery → toggle switch → buck</strong><br>Battery+ → switch leg1, switch leg2 → buck IN+. Battery- → buck IN-. Buck OUT+ → ESP32 VIN.</div>
+  </div>
+  <div class="order-item">
+    <div class="order-text"><strong>Upload full code + test WiFi</strong><br>Connect to RescueRobot WiFi, open 192.168.4.1. All sensor pills should show green!</div>
+  </div>
+</div>
+</div>
+
+<!-- POWER TAB -->
+<div class="panel" id="tab-power">
+<div style="font-family:var(--font-mono);font-size:12px;line-height:2;background:var(--color-background-secondary);padding:14px;border-radius:var(--border-radius-lg);color:var(--color-text-primary)">
+Battery +<br>
+&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;├──→ [Toggle Switch] ──→ Buck IN+<br>
+&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──→ Buck OUT+ ──→ ESP32 VIN<br>
+&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;└──→ TB6612 VM (motor power)<br>
+<br>
+Battery -<br>
+&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;├──→ Buck IN-<br>
+&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──→ Buck OUT- ──→ ESP32 GND<br>
+&nbsp;&nbsp;│<br>
+&nbsp;&nbsp;└──→ TB6612 GND<br>
+<br>
+ESP32 3.3V ──→ All sensor VCC<br>
+ESP32 GND &nbsp;──→ All sensor GND
+</div>
+<div style="margin-top:10px;padding:10px 12px;border-radius:var(--border-radius-md);background:#FAEEDA;border:0.5px solid #BA7517;font-size:12px;color:#633806;line-height:1.6">
+<b>Critical rules:</b><br>
+• All sensors use 3.3V — NEVER 5V or battery directly!<br>
+• TB6612 VM uses battery directly (motors need full power)<br>
+• ESP32 uses 5V from buck converter via VIN pin<br>
+• Toggle switch cuts ALL power when flipped OFF<br>
+• TP4056 charges batteries via USB — disconnect when robot running!
+</div>
+</div>
+
+</div>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

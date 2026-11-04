@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swarm Bot Wiring Guide</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f0f1a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+  h1 { text-align: center; color: #00e5ff; font-size: 1.6em; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #888; font-size: 0.85em; margin-bottom: 20px; }
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+  .card { background: #1a1a2e; border-radius: 12px; overflow: hidden; border: 1px solid #2a2a4a; }
+  .card-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; user-select: none; }
+  .step-num { background: #00e5ff; color: #0f0f1a; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; flex-shrink: 0; }
+  .step-title { font-weight: 600; font-size: 1em; flex: 1; }
+  .step-badge { font-size: 0.7em; padding: 3px 8px; border-radius: 20px; }
+  .badge-danger { background: #ff174433; color: #ff4444; border: 1px solid #ff444455; }
+  .badge-ok { background: #00ff8833; color: #00ff88; border: 1px solid #00ff8855; }
+  .badge-comm { background: #aa44ff33; color: #cc88ff; border: 1px solid #aa44ff55; }
+  .arrow { color: #555; transition: transform 0.3s; font-size: 0.8em; }
+  .card.open .arrow { transform: rotate(180deg); }
+  .card-body { display: none; padding: 0 16px 16px; }
+  .card.open .card-body { display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 10px; }
+  th { background: #252540; color: #00e5ff; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #2a2a3a; }
+  tr:last-child td { border-bottom: none; }
+  .pin-from { color: #ffd700; font-weight: 600; }
+  .pin-to { color: #00ff88; font-weight: 600; }
+  .wire-red { color: #ff4444; }
+  .wire-black { color: #aaa; }
+  .wire-yellow { color: #ffd700; }
+  .wire-blue { color: #4488ff; }
+  .wire-green { color: #00ff88; }
+  .warn { background: #ff17440f; border: 1px solid #ff444433; border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 0.82em; color: #ff8888; }
+  .tip { background: #00e5ff0f; border: 1px solid #00e5ff33; border-radius: 8px; padding: 10px 14px; margin-top: 10px; font-size: 0.82em; color: #88ddff; }
+  .progress-bar { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .prog-step { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 20px; padding: 4px 12px; font-size: 0.75em; color: #555; cursor: pointer; transition: all 0.2s; }
+  .prog-step.done { background: #00ff8822; border-color: #00ff88; color: #00ff88; }
+  .prog-step.active { background: #00e5ff22; border-color: #00e5ff; color: #00e5ff; }
+  .verify { margin-top: 10px; }
+  .verify-btn { background: #00e5ff22; border: 1px solid #00e5ff; color: #00e5ff; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8em; margin-top: 8px; }
+  .verify-btn:hover { background: #00e5ff44; }
+  .verify-result { font-size: 0.8em; margin-top: 6px; color: #00ff88; display: none; }
+</style>
+</head>
+<body>
+
+<h1>⚡ Swarm Bot — Wiring Guide</h1>
+<p class="subtitle">ESP32 DevKit V1 | TB6612FNG | VL53L0X | MPU6050 | LM393 | LM2596</p>
+
+<div class="progress-bar" id="progressBar">
+  <div class="prog-step active" onclick="scrollTo(0)">⚡ Power</div>
+  <div class="prog-step" onclick="">🧠 ESP32</div>
+  <div class="prog-step" onclick="">👁️ VL53L0X</div>
+  <div class="prog-step" onclick="">🌀 MPU6050</div>
+  <div class="prog-step" onclick="">🚗 TB6612FNG</div>
+  <div class="prog-step" onclick="">📡 Encoders</div>
+  <div class="prog-step" onclick="">✅ Final Check</div>
+</div>
+
+<div class="steps">
+
+  <!-- STEP 1 -->
+  <div class="card open" id="s1">
+    <div class="card-header" onclick="toggle('s1')">
+      <div class="step-num">1</div>
+      <div class="step-title">⚡ Power Setup — LM2596 Buck Converter</div>
+      <span class="step-badge badge-danger">DO THIS FIRST</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>From</th><th>To</th><th>Wire</th></tr>
+        <tr><td class="pin-from">18650 Holder B+</td><td class="pin-to">LM2596 IN+</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">18650 Holder B-</td><td class="pin-to">LM2596 IN-</td><td class="wire-black">⚫ Black</td></tr>
+        <tr><td class="pin-from">LM2596 OUT+</td><td class="pin-to">Breadboard (+) Rail</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">LM2596 OUT-</td><td class="pin-to">Breadboard (−) Rail</td><td class="wire-black">⚫ Black</td></tr>
+      </table>
+      <div class="warn">⚠️ CRITICAL: Use a multimeter on OUT+ and OUT−. Adjust the brass screw on LM2596 until you read exactly <strong>5.0V</strong>. Default may be 12V which will instantly destroy your ESP32!</div>
+      <div class="tip">💡 Battery voltage (~7.4V from 2x 18650) goes into IN. Regulated 5V comes out of OUT. Always power off batteries before rewiring.</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card" id="s2">
+    <div class="card-header" onclick="toggle('s2')">
+      <div class="step-num">2</div>
+      <div class="step-title">🧠 ESP32 DevKit V1 — Power Connection</div>
+      <span class="step-badge badge-ok">Core Brain</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>From</th><th>To</th><th>Wire</th></tr>
+        <tr><td class="pin-from">Breadboard (+) Rail (5V)</td><td class="pin-to">ESP32 VIN</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">Breadboard (−) Rail (GND)</td><td class="pin-to">ESP32 GND</td><td class="wire-black">⚫ Black</td></tr>
+      </table>
+      <div class="tip">💡 Place ESP32 straddling the center gap of the breadboard. The USB port should face outward for easy programming access. ESP32 outputs 3.3V on its 3V3 pin — use this for sensors, NOT the 5V rail directly.</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card" id="s3">
+    <div class="card-header" onclick="toggle('s3')">
+      <div class="step-num">3</div>
+      <div class="step-title">👁️ VL53L0X ToF Laser Sensor (GY-530)</div>
+      <span class="step-badge badge-ok">I2C — Addr: 0x29</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>VL53L0X Pin</th><th>ESP32 Pin</th><th>Wire</th></tr>
+        <tr><td class="pin-from">VCC</td><td class="pin-to">3V3 (ESP32)</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">GND</td><td class="pin-to">GND</td><td class="wire-black">⚫ Black</td></tr>
+        <tr><td class="pin-from">SCL</td><td class="pin-to">GPIO 22</td><td class="wire-yellow">🟡 Yellow</td></tr>
+        <tr><td class="pin-from">SDA</td><td class="pin-to">GPIO 21</td><td class="wire-blue">🔵 Blue</td></tr>
+        <tr><td class="pin-from">XSHUT</td><td class="pin-to">GPIO 16 (optional)</td><td class="wire-green">🟢 Green</td></tr>
+      </table>
+      <div class="tip">💡 Mount this sensor at the very front of the chassis facing forward. It gives distance readings from 2cm to 200cm with ±1mm accuracy. Install library: <strong>Adafruit VL53L0X</strong> in Arduino IDE.</div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="card" id="s4">
+    <div class="card-header" onclick="toggle('s4')">
+      <div class="step-num">4</div>
+      <div class="step-title">🌀 MPU6050 Gyro/Accelerometer (R233573)</div>
+      <span class="step-badge badge-ok">I2C — Addr: 0x68</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>MPU6050 Pin</th><th>ESP32 Pin</th><th>Wire</th></tr>
+        <tr><td class="pin-from">VCC</td><td class="pin-to">3V3 (ESP32)</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">GND</td><td class="pin-to">GND</td><td class="wire-black">⚫ Black</td></tr>
+        <tr><td class="pin-from">SCL</td><td class="pin-to">GPIO 22</td><td class="wire-yellow">🟡 Yellow</td></tr>
+        <tr><td class="pin-from">SDA</td><td class="pin-to">GPIO 21</td><td class="wire-blue">🔵 Blue</td></tr>
+        <tr><td class="pin-from">INT</td><td class="pin-to">GPIO 17 (optional)</td><td class="wire-green">🟢 Green</td></tr>
+      </table>
+      <div class="tip">💡 Both VL53L0X and MPU6050 share GPIO 21 (SDA) and GPIO 22 (SCL) — this is fine! I2C supports multiple devices on the same bus. Mount MPU6050 at the center of chassis for accurate turn calculations. Install library: <strong>Adafruit MPU6050</strong>.</div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="card" id="s5">
+    <div class="card-header" onclick="toggle('s5')">
+      <div class="step-num">5</div>
+      <div class="step-title">🚗 TB6612FNG Motor Driver (SKU: 43846)</div>
+      <span class="step-badge badge-ok">Dual Motor Control</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>TB6612FNG Pin</th><th>Connect To</th><th>Wire</th></tr>
+        <tr><td class="pin-from">VM</td><td class="pin-to">Battery B+ DIRECTLY</td><td class="wire-red">🔴 Red (raw battery!)</td></tr>
+        <tr><td class="pin-from">VCC</td><td class="pin-to">ESP32 3V3</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">GND</td><td class="pin-to">GND Rail</td><td class="wire-black">⚫ Black</td></tr>
+        <tr><td class="pin-from">STBY</td><td class="pin-to">ESP32 3V3 (enable)</td><td class="wire-red">🔴 Red</td></tr>
+        <tr><td class="pin-from">PWMA</td><td class="pin-to">ESP32 GPIO 18</td><td class="wire-yellow">🟡 Yellow</td></tr>
+        <tr><td class="pin-from">AIN1</td><td class="pin-to">ESP32 GPIO 19</td><td class="wire-yellow">🟡 Yellow</td></tr>
+        <tr><td class="pin-from">AIN2</td><td class="pin-to">ESP32 GPIO 23</td><td class="wire-yellow">🟡 Yellow</td></tr>
+        <tr><td class="pin-from">PWMB</td><td class="pin-to">ESP32 GPIO 25</td><td class="wire-blue">🔵 Blue</td></tr>
+        <tr><td class="pin-from">BIN1</td><td class="pin-to">ESP32 GPIO 26</td><td class="wire-blue">🔵 Blue</td></tr>
+        <tr><td class="pin-from">BIN2</td><td class="pin-to">ESP32 GPIO 27</td><td class="wire-blue">🔵 Blue</td></tr>
+        <tr><td class="pin-from">AO1, AO2</td><td class="pin-to">Left Motor terminals</td><td class="wire-green">🟢 Green</td></tr>
+        <tr><td class="pin-from">BO1, BO2</td><td class="pin-to">Right Motor terminals</td><td class="wire-green">🟢 Green</td></tr>
+      </table>
+      <div class="warn">⚠️ VM must connect to RAW battery voltage (7.4V), NOT the 5V regulated rail. The motors need full voltage to run properly!</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="card" id="s6">
+    <div class="card-header" onclick="toggle('s6')">
+      <div class="step-num">6</div>
+      <div class="step-title">📡 LM393 Speed Encoder Sensors (x2)</div>
+      <span class="step-badge badge-ok">Wheel Odometry</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>LM393 Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        <tr><td class="pin-from">VCC</td><td class="pin-to">3V3</td><td>Both sensors</td></tr>
+        <tr><td class="pin-from">GND</td><td class="pin-to">GND</td><td>Both sensors</td></tr>
+        <tr><td class="pin-from">D0 (Left encoder)</td><td class="pin-to">GPIO 34</td><td>Input only pin</td></tr>
+        <tr><td class="pin-from">D0 (Right encoder)</td><td class="pin-to">GPIO 35</td><td>Input only pin</td></tr>
+      </table>
+      <div class="tip">💡 GPIO 34 and 35 are INPUT ONLY on ESP32 — perfect for encoders. Mount the IR slot sensor so the encoder disc wheel passes through the gap. Each slot = 1 pulse = known distance moved. Used for dead-reckoning navigation.</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="card" id="s7">
+    <div class="card-header" onclick="toggle('s7')">
+      <div class="step-num">7</div>
+      <div class="step-title">✅ Final Pin Summary & Sanity Check</div>
+      <span class="step-badge badge-comm">Before Powering On</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>GPIO</th><th>Connected To</th><th>Type</th></tr>
+        <tr><td>GPIO 21</td><td>SDA — VL53L0X + MPU6050</td><td>I2C</td></tr>
+        <tr><td>GPIO 22</td><td>SCL — VL53L0X + MPU6050</td><td>I2C</td></tr>
+        <tr><td>GPIO 18</td><td>PWMA — Motor A speed</td><td>PWM OUT</td></tr>
+        <tr><td>GPIO 19</td><td>AIN1 — Motor A dir</td><td>Digital OUT</td></tr>
+        <tr><td>GPIO 23</td><td>AIN2 — Motor A dir</td><td>Digital OUT</td></tr>
+        <tr><td>GPIO 25</td><td>PWMB — Motor B speed</td><td>PWM OUT</td></tr>
+        <tr><td>GPIO 26</td><td>BIN1 — Motor B dir</td><td>Digital OUT</td></tr>
+        <tr><td>GPIO 27</td><td>BIN2 — Motor B dir</td><td>Digital OUT</td></tr>
+        <tr><td>GPIO 34</td><td>Left Encoder D0</td><td>Digital IN</td></tr>
+        <tr><td>GPIO 35</td><td>Right Encoder D0</td><td>Digital IN</td></tr>
+        <tr><td>GPIO 16</td><td>VL53L0X XSHUT (opt)</td><td>Digital OUT</td></tr>
+        <tr><td>GPIO 17</td><td>MPU6050 INT (opt)</td><td>Digital IN</td></tr>
+      </table>
+      <div class="tip">✅ Checklist before powering on:<br>
+        □ Buck converter set to 5.0V verified with multimeter<br>
+        □ VM on TB6612 goes to raw battery, not 5V rail<br>
+        □ All sensor VCC connected to ESP32 3V3 (not 5V)<br>
+        □ STBY pin on TB6612 tied to 3V3 (not floating)<br>
+        □ No exposed wire bridges on breadboard<br>
+        □ USB cable connected to laptop before turning on batteries
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(id) {
+    const card = document.getElementById(id);
+    card.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
